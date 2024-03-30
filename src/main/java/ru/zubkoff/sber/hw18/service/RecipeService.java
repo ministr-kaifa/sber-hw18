@@ -1,8 +1,10 @@
 package ru.zubkoff.sber.hw18.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ru.zubkoff.sber.hw18.domain.Recipe;
 import ru.zubkoff.sber.hw18.persistence.RecipeRepository;
@@ -21,8 +23,8 @@ public class RecipeService {
    * @param name Имя рецепта для поиска.
    * @return Список рецептов без ингредиентов с указанным именем.
    */
-  public List<Recipe> findReducedRecipeByNameLike(String name) {
-    return recipeRepository.findReducedRecipeByNameLike(name);
+  public List<Recipe> findByNameContainingIgnoreCase(String recipeNamePart) {
+    return recipeRepository.findByNameContainingIgnoreCase(recipeNamePart);
   }
 
   /**
@@ -31,26 +33,22 @@ public class RecipeService {
    * @param id Идентификатор рецепта.
    * @return Рецепт с ингредиентами.
    */
-  public Recipe findRecipeByIdWithIngredients(long id) {
-    return recipeRepository.findRecipeByIdWithIngredients(id);
+  @Transactional(readOnly = true)
+  public Optional<Recipe> findWithEntriesFetchedById(Long id) {
+    return recipeRepository.findWithEntriesFetchedById(id);
   }
 
-  /**
-   * Создает новый рецепт.
-   *
-   * @param recipe Новый рецепт для создания.
-   */
-  public void createRecipe(Recipe recipe) {
-    recipeRepository.persistRecipe(recipe);
-  }
-
-  /**
-   * Удаляет рецепт с указанным идентификатором.
-   *
-   * @param id Идентификатор рецепта для удаления.
-   */
-  public void deleteById(long id) {
+  public void deleteById(Long id) {
     recipeRepository.deleteById(id);
   }
 
+  /**
+   * Сохраняет или изменяет существующий рецепт
+   *
+   * @param recipe рецепт
+   */
+  @Transactional
+  public void mergeRecipe(Recipe recipe) {
+    recipeRepository.merge(recipe);
+  }
 }

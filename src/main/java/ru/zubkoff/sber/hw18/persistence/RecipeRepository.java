@@ -2,16 +2,13 @@ package ru.zubkoff.sber.hw18.persistence;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
 import ru.zubkoff.sber.hw18.domain.Recipe;
 
-public interface RecipeRepository {
-
-  List<Recipe> findReducedRecipeByNameLike(String name);
-
-  Recipe findRecipeByIdWithIngredients(long id);
-
-  void persistRecipe(Recipe recipe);
-
-  void deleteById(long id);
-
+@Repository
+public interface RecipeRepository
+    extends JpaRepository<Recipe, Long>, EntriesFetchRecipeRepository, MergeRecipeRepository {
+  List<Recipe> findByNameContainingIgnoreCase(String name);
 }
